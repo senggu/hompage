@@ -5,15 +5,16 @@
     <script>
         function fetchData() {
             var xhr = new XMLHttpRequest();
-            // CORS 프록시를 사용하여 Mobius 서버에 요청
-            var proxyUrl = "https://corsproxy.io/?" + encodeURIComponent("http://mobius.iotocean.org:7579/Mobius/gas_zone1/ens160_sensor?fu=1&ty=4");
+            // Codetabs 프록시를 사용하여 Mobius 서버에 요청
+            var mobiusUrl = "http://mobius.iotocean.org:7579/Mobius/gas_zone1/ens160_sensor?fu=1&ty=4";
+            var proxyUrl = "https://api.codetabs.com/v1/proxy?quest=" + mobiusUrl;
 
             xhr.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
                     var response = JSON.parse(this.responseText);
                     var uril = response['m2m:uril'];
                     if (uril && uril.length) {
-                        document.getElementById("dataDisplay").innerHTML = ""; // 기존 데이터를 지우고 새 데이터를 표시합니다.
+                        document.getElementById("dataDisplay").innerHTML = ""; 
                         uril.forEach(function(uri) {
                             fetchIndividualData(uri);
                         });
@@ -30,8 +31,8 @@
 
         function fetchIndividualData(uri) {
             var xhr = new XMLHttpRequest();
-            // 각 URI에 대한 요청도 프록시를 통해 중계
-            var proxyUrl = "https://corsproxy.io/?" + encodeURIComponent("http://mobius.iotocean.org:7579/" + uri);
+            var mobiusIndividualUrl = "http://mobius.iotocean.org:7579/" + uri;
+            var proxyIndividualUrl = "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(mobiusIndividualUrl);
 
             xhr.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
@@ -43,7 +44,7 @@
                 }
             };
 
-            xhr.open("GET", proxyUrl, true);
+            xhr.open("GET", proxyIndividualUrl, true);
             xhr.setRequestHeader("Accept", "application/json");
             xhr.setRequestHeader("X-M2M-RI", "12345");
             xhr.setRequestHeader("X-M2M-Origin", "senggu");
